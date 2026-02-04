@@ -40,11 +40,11 @@ jobs:
           haxe-version: ${{ env.HAXE_VERSION }}
 
       # ---------- FIX HAXELIB BLOCK ----------
-      - name: Fix haxelib repository
-        run: |
-          haxelib setup ~/haxelib
-          haxelib repository https://lib.haxe.org
-          haxelib update haxelib
+      - name: Fix haxelib
+  run: |
+    mkdir -p ~/haxelib
+    haxelib setup ~/haxelib
+    haxelib --global update haxelib
 
       # ---------- CACHE ----------
       - name: Cache haxelib
