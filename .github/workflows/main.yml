@@ -1,53 +1,55 @@
-name: Main
+name: Termux Engine
 
 on:
   workflow_dispatch:
 
 jobs:
   build:
+    name: Termux Engine - ${{ matrix.name }}
+
     strategy:
       matrix:
         include:
           - name: Windows x64
             os: windows-2022
             buildArgs: windows
-            artifactName: Windows-x64
+            artifactName: TermuxEngine-Windows-x64
             artifactPath: export/release/windows/bin/*
 
           - name: Windows x32
             os: windows-2022
             buildArgs: "windows -32 -D HXCPP_M32 -D 32bits"
-            artifactName: Windows-x32
+            artifactName: TermuxEngine-Windows-x32
             artifactPath: export/32bit/windows/bin/*
 
           - name: Linux
             os: ubuntu-22.04
             buildArgs: linux
-            artifactName: Linux
+            artifactName: TermuxEngine-Linux
             artifactPath: export/release/linux/bin/*
 
           - name: MacOS
             os: macos-15
             buildArgs: mac
-            artifactName: MacOS
+            artifactName: TermuxEngine-MacOS
             artifactPath: export/release/macos/bin/*
 
           - name: Android
             os: macos-15
             buildArgs: "android -ONLY_ARM64"
-            artifactName: Android
+            artifactName: TermuxEngine-Android
             artifactPath: export/release/android/bin/app/build/outputs/apk/release/*.apk
 
           - name: iOS
             os: macos-15
             buildArgs: "ios -nosign"
-            artifactName: IOS
+            artifactName: TermuxEngine-iOS
             artifactPath: export/release/ios/build/Release-iphoneos/*.ipa
 
     uses: ./.github/workflows/build.yml
 
     with:
-      name: ${{ matrix.name }}
+      name: Termux Engine - ${{ matrix.name }}
       os: ${{ matrix.os }}
       buildArgs: ${{ matrix.buildArgs }}
       artifactName: ${{ matrix.artifactName }}
