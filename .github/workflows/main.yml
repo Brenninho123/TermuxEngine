@@ -2,12 +2,20 @@ name: Termux Engine
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+
+concurrency:
+  group: termux-engine-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     name: Termux Engine - ${{ matrix.name }}
+    uses: ./.github/workflows/build.yml
 
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: Windows x64
@@ -28,12 +36,14 @@ jobs:
             artifactName: TermuxEngine-Linux
             artifactPath: export/release/linux/bin/*
 
+          # macOS Intel evita erro ARM64
           - name: MacOS
-            os: macos-13   # ← evita ARM64
+            os: macos-13
             buildArgs: mac
             artifactName: TermuxEngine-MacOS
             artifactPath: export/release/macos/bin/*
 
+          # Android/iOS também no macOS Intel
           - name: Android
             os: macos-13
             buildArgs: "android -ONLY_ARM64"
@@ -45,8 +55,6 @@ jobs:
             buildArgs: "ios -nosign"
             artifactName: TermuxEngine-iOS
             artifactPath: export/release/ios/build/Release-iphoneos/*.ipa
-
-    uses: ./.github/workflows/build.yml
 
     with:
       name: Termux Engine - ${{ matrix.name }}
