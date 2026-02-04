@@ -27,39 +27,48 @@ jobs:
   build:
     name: ${{ inputs.name }}
     runs-on: ${{ inputs.os }}
+    timeout-minutes: 60
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # ---------- HAXE ----------
       - name: Setup Haxe
         uses: krdlab/setup-haxe@v1
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
 
-      # Corrige bloqueio do haxelib
-      - name: Fix haxelib
+      # ---------- FIX HAXELIB BLOCK ----------
+      - name: Fix haxelib repository
         run: |
           haxelib setup ~/haxelib
           haxelib repository https://lib.haxe.org
           haxelib update haxelib
 
-      # Cache para acelerar builds
+      # ---------- CACHE ----------
       - name: Cache haxelib
         uses: actions/cache@v4
         with:
           path: ~/haxelib
-          key: ${{ runner.os }}-haxelib
+          key: ${{ runner.os }}-haxelib-${{ hashFiles('**/hmm.json') }}
+          restore-keys: |
+            ${{ runner.os }}-haxelib-
 
+      # ---------- LINUX DEP ----------
       - name: Install libVLC (Linux)
         if: contains(inputs.name, 'Linux')
-        run: sudo apt-get update && sudo apt-get install -y libvlc-dev libvlccore-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libvlc-dev libvlccore-dev
 
-      - name: Install Libraries
+      # ---------- INSTALL LIBS ----------
+      - name: Install Haxe libraries
         run: |
           haxelib install hmm --quiet
           haxelib run hmm install --quiet
 
+      # ---------- ANDROID ----------
       - name: Configure Android
         if: contains(inputs.name, 'Android')
         run: |
@@ -68,17 +77,20 @@ jobs:
           haxelib run lime config JAVA_HOME $JAVA_HOME_17_arm64
           haxelib run lime config ANDROID_SETUP true
 
+      # ---------- BUILD ----------
       - name: Compile
         run: haxelib run lime build ${{ inputs.buildArgs }}
 
+      # ---------- IPA ----------
       - name: Make IPA
         if: contains(inputs.name, 'iOS')
         run: |
           cd export/release/ios/build/Release-iphoneos
-          mkdir Payload
+          mkdir -p Payload
           mv *.app Payload
           zip -r ${{ env.PROJECT_NAME }}.ipa Payload
 
+      # ---------- UPLOAD ----------
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
