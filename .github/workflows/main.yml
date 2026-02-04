@@ -5,10 +5,6 @@ on:
   push:
     branches: [main]
 
-concurrency:
-  group: termux-engine-${{ github.ref }}
-  cancel-in-progress: false
-
 jobs:
   build:
     name: Termux Engine - ${{ matrix.name }}
@@ -24,37 +20,18 @@ jobs:
             artifactName: TermuxEngine-Windows-x64
             artifactPath: export/release/windows/bin/*
 
-          - name: Windows x32
-            os: windows-2022
-            buildArgs: "windows -32 -D HXCPP_M32 -D 32bits"
-            artifactName: TermuxEngine-Windows-x32
-            artifactPath: export/32bit/windows/bin/*
-
           - name: Linux
             os: ubuntu-22.04
             buildArgs: linux
             artifactName: TermuxEngine-Linux
             artifactPath: export/release/linux/bin/*
 
-          # macOS Intel evita erro ARM64
-          - name: MacOS
-            os: macos-13
-            buildArgs: mac
-            artifactName: TermuxEngine-MacOS
-            artifactPath: export/release/macos/bin/*
-
-          # Android/iOS também no macOS Intel
+          # 🔥 Android agora no Linux (sem macOS)
           - name: Android
-            os: macos-13
+            os: ubuntu-22.04
             buildArgs: "android -ONLY_ARM64"
             artifactName: TermuxEngine-Android
             artifactPath: export/release/android/bin/app/build/outputs/apk/release/*.apk
-
-          - name: iOS
-            os: macos-13
-            buildArgs: "ios -nosign"
-            artifactName: TermuxEngine-iOS
-            artifactPath: export/release/ios/build/Release-iphoneos/*.ipa
 
     with:
       name: Termux Engine - ${{ matrix.name }}
