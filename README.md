@@ -1,6 +1,4 @@
-# Friday Night Funkin' - Psych Engine v0.6.3 Template
-
-This Template for Making any Mods and Engines you want, with Mobile Support.
+# Friday Night Funkin' - Termux Engine
 
 ![special](docs/img/special.png)
 
