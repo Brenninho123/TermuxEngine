@@ -37,14 +37,14 @@ jobs:
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
 
-      # 🔥 Corrige bug do lib.haxe.org bloqueado
+      # Corrige bloqueio do haxelib
       - name: Fix haxelib
         run: |
           haxelib setup ~/haxelib
           haxelib repository https://lib.haxe.org
           haxelib update haxelib
 
-      # ⚡ Cache das libs
+      # Cache para acelerar builds
       - name: Cache haxelib
         uses: actions/cache@v4
         with:
